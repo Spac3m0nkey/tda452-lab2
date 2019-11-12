@@ -108,7 +108,7 @@ playBank deck = bankDraw deck Empty
 getCard :: Integer -> Hand -> (Hand, Card)
 getCard _ Empty = error "getCard: Wowie"
 getCard n hand  | n < 0 = error "getCard: negative >:("
-                | n > (size hand) = error "getCard: Out of bounds"
+                | n >= (size hand) = error "getCard: Out of bounds"
                 | otherwise = getRemoveAt n hand Empty (Card (Numeric 2) Hearts)
                     where 
                         getRemoveAt :: Integer -> Hand -> Hand -> Card -> (Hand, Card)
@@ -116,15 +116,12 @@ getCard n hand  | n < 0 = error "getCard: negative >:("
                         getRemoveAt 0 (Add c h) out _ = getRemoveAt (-1) h out c
                         getRemoveAt i (Add c h) out card = getRemoveAt (i-1) h (Add c out) card 
 
-prop_getCard_size :: Integer -> Hand -> Property
-prop_getCard_size = (size hand3) === (size(fst (getCard 2 hand3)) + 1)
-
 shuffleDeck :: StdGen -> Hand -> Hand
 shuffleDeck g deck = shuffle (randomR (0, (size deck) - 1) g) deck Empty
     where 
         shuffle :: (Integer, StdGen) -> Hand -> Hand -> Hand
         shuffle _ Empty hand = hand
-        shuffle (i, g') h1 h2 = shuffle (randomR (0, ((size h1) - 1)) g') 
+        shuffle (i, g') h1 h2 = shuffle (randomR (0, ((size h1) - 2)) g') 
             (fst (getCard i h1)) 
             (Add (snd (getCard i h1)) h2)
 
